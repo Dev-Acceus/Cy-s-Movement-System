@@ -1,4 +1,7 @@
 # Cyrus-Movement-System
+## Bug-Fix
+- [ ] Debounce for Dash to Sprint Animation
+- [ ] BodyVelocity instead of Velocity?
 
 ## Features
 ### Walk
@@ -10,10 +13,10 @@
 
 ### Directional Dashes
 - [X] Forward Dash
-- [ ] Backward Dash
-- [ ] Left Dash
-- [ ] Right Dash
-- [ ] Camera FOV
+- [X] Backward Dash
+- [X] Left Dash
+- [X] Right Dash
+- [X] Camera FOV
 
 ### Dodges
 - ???
