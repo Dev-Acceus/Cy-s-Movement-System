@@ -1,61 +1,90 @@
--- Services
+--|| SERVICES ||--
 local UIS = game:GetService("UserInputService")
+local Storage = game:GetService("ReplicatedStorage")
+local camera = game.Workspace.CurrentCamera
 
--- Constants
+--|| DEFAULT CONSTANTS ||--
 local fovDefault = { FieldOfView = 70 }
 local normalSpeed = 8
 
--- Player variables
+--|| PLAYER VARIABLES ||--
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 local Root = Character:WaitForChild("HumanoidRootPart")
 
 
--- Sprint Variables
-local sprintKey = Enum.KeyCode.LeftShift
-local sprintSpeed = 35
+--|| SPRINT VARIABLES ||--
+local sprintProperties = {
+	key = Enum.KeyCode.LeftShift,
+	speed = 35
+}
 
-local sprintFov = { FieldOfView = 70 + (sprintSpeed/4) }
-local camera = game.Workspace.CurrentCamera
+local sprintFov = { FieldOfView = 70 + (sprintProperties.speed/4) }
 local tSprintStart = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), sprintFov)
 local tSprintEnd = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), fovDefault)
 
-local sprintAnimation = Instance.new("Animation")
-sprintAnimation.AnimationId = "rbxassetid://6361709833"
-local sprintTrack = Humanoid:LoadAnimation(sprintAnimation)
+local sprintTrack = Humanoid:LoadAnimation(Storage.Animations.Sprint)
 
--- Dash Variables
-local dashKey = Enum.KeyCode.Q
-local can_dash = true
-local dashCooldown = 2			-- time before player can dash again
-local dashVelocity = 175
-local dashAnimation = Instance.new("Animation")
-dashAnimation.AnimationId = "rbxassetid://6385743643"
-local dashTrack = Humanoid:LoadAnimation(dashAnimation)		-- dash animation object
+--|| DASH VARIABLES ||--
+local dashProperties = {
+	frontKey = Enum.KeyCode.W,
+	backKey = Enum.KeyCode.S,
+	leftKey = Enum.KeyCode.A,
+	rightKey = Enum.KeyCode.D,
+	
+	lastW = tick(),
+	lastS = tick(),
+	lastA = tick(),
+	lastD = tick(),
+	
+	tapSpeed = 0.3,
+	cooldown = 2,
+	velocity = 175
+}
 
-local dashFov = { FieldOfView = 70 + (dashVelocity / 11)}	-- camera FOV changes when player dashes
+--|| DASH ANIMATIONS ||--
+local frontDashTrack = Humanoid:LoadAnimation(Storage.Animations.FrontDash)		-- dash animation object
+local backDashTrack = Humanoid:LoadAnimation(Storage.Animations.BackDash)
+local leftDashTrack = Humanoid:LoadAnimation(Storage.Animations.LeftDash)
+local rightDashTrack = Humanoid:LoadAnimation(Storage.Animations.RightDash)
+
+local dashFov = { FieldOfView = 70 + (dashProperties.velocity / 11)}	-- camera FOV changes when player dashes
 local dashCamResetTime = .5									-- time before camera resets back to original
 local tDashStart = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), dashFov)
 local tDashEnd = tSprintEnd
 
--- Dodge Variables
+--|| DODGE VARIABLES ||--
 local dodgeKey = Enum.KeyCode.E
 
-local function playDashAnimations()
-	dashTrack:Play()		-- animation
+--|| FUNCTIONS ||--
+local function playDashAnimations(direction)
+	if direction == "front" then
+		frontDashTrack:Play()		-- animation
+	elseif direction == "back" then
+		backDashTrack:Play()
+	elseif direction == "left" then
+		leftDashTrack:Play()
+	elseif direction == "right" then
+		rightDashTrack:Play()
+	end
 	tDashStart:Play()		-- camera FOV tween
 end
 
+can_dash = true
 
--- Events
+--|| EVENTS ||--
 
--- On player respawns, rebind character variables
+-- On player respawn, rebind character variables
 Player.CharacterAdded:Connect(function(char)
 	Character = Player.Character or Player.CharacterAdded:Wait()
 	Humanoid = Character:WaitForChild("Humanoid")
 	Root = Character:WaitForChild("HumanoidRootPart")
-	dashTrack = Humanoid:LoadAnimation(dashAnimation)		-- dash animation object
+	sprintTrack = Humanoid:LoadAnimation(Storage.Animations.Sprint)			-- sprint animation
+	frontDashTrack = Humanoid:LoadAnimation(Storage.Animations.FrontDash)		-- dash animation object
+	backDashTrack = Humanoid:LoadAnimation(Storage.Animations.BackDash)
+	leftDashTrack = Humanoid:LoadAnimation(Storage.Animations.LeftDash)
+	rightDashTrack = Humanoid:LoadAnimation(Storage.Animations.RightDash)
 	Humanoid.WalkSpeed = normalSpeed
 end)
 
@@ -66,43 +95,112 @@ UIS.InputBegan:Connect(function(input, processed)
 	-- Input Events
 	if input.UserInputType == Enum.UserInputType.Keyboard then
 		-- Sprint
-		if input.KeyCode == sprintKey then
-			Humanoid.WalkSpeed = sprintSpeed
+		if input.KeyCode == sprintProperties.key then
+			Humanoid.WalkSpeed = sprintProperties.speed
 			tSprintStart:Play()		-- Camera FOV
 			
 		-- Dash
-		elseif input.KeyCode == dashKey then
-			-- Cooldown Check
-			if can_dash then
-				Root.Velocity = Root.CFrame.lookVector * dashVelocity
-				can_dash = false
-				-- play dash animation and camera FOV
-				playDashAnimations()
-				wait(dashCamResetTime)
-				-- if in sprint mode, return to sprint FOV
-				if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
-					tSprintStart:Play()
-				else
-					tDashEnd:Play()
+		-- Check dash cooldown
+		elseif can_dash then
+			-- front dash
+			if input.KeyCode == dashProperties.frontKey then
+				-- double tap check
+				if tick() - dashProperties.lastW <= dashProperties.tapSpeed then
+					Root.Velocity = Root.CFrame.lookVector * dashProperties.velocity
+					can_dash = false
+					-- play dash animation and camera FOV
+					playDashAnimations("front")
+					wait(dashCamResetTime)
+					-- if in sprint mode, return to sprint FOV
+					if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
+						tSprintStart:Play()
+					else
+						tDashEnd:Play()
+					end
+
+					-- wait for cooldown
+					wait(dashProperties.cooldown)
+					can_dash = true
 				end
+				dashProperties.lastW = tick()
 				
-				wait(dashCooldown)
-				can_dash = true
+			-- back dash
+			elseif input.KeyCode == dashProperties.backKey then
+				-- double tap check
+				if tick() - dashProperties.lastS <= dashProperties.tapSpeed then
+					-- back dash process	
+					Root.Velocity = Root.CFrame.lookVector * -dashProperties.velocity
+					can_dash = false
+					-- play dash animation and camera FOV
+					playDashAnimations("back")
+					wait(dashCamResetTime)
+					-- if in sprint mode, return to sprint FOV
+					if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
+						tSprintStart:Play()
+					else
+						tDashEnd:Play()
+					end
+					-- wait for cooldown
+					wait(dashProperties.cooldown)
+					can_dash = true
+				end
+				dashProperties.lastS = tick()
+				
+			-- left dash
+			elseif input.KeyCode == dashProperties.leftKey then
+				if tick() - dashProperties.lastA <= dashProperties.tapSpeed then
+					Root.Velocity = Root.CFrame.RightVector * -dashProperties.velocity
+					can_dash = false
+					-- play dash animations and camera FOV
+					playDashAnimations("left")
+					wait(dashCamResetTime)
+					-- if in sprint mode, return to sprint FOV
+					if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
+						tSprintStart:Play()
+					else
+						tDashEnd:Play()
+					end
+					-- wait for cooldown
+					wait(dashProperties.cooldown)
+					can_dash = true
+				end
+				dashProperties.lastA = tick()
+				
+			-- right dash
+			elseif input.KeyCode == dashProperties.rightKey then
+				if tick() - dashProperties.lastD <= dashProperties.tapSpeed then
+					Root.Velocity = Root.CFrame.RightVector * dashProperties.velocity
+					can_dash = false
+					-- play dash animations and camera FOV
+					playDashAnimations("right")
+					wait(dashCamResetTime)
+					-- if in sprint mode, return to sprint FOV
+					if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then
+						tSprintStart:Play()
+					else
+						tDashEnd:Play()
+					end
+					-- wait for cooldown
+					wait(dashProperties.cooldown)
+					can_dash = true
+				end
+				dashProperties.lastD = tick()
 			end
 			
 		-- Dodge
 		elseif input.KeyCode == dodgeKey then
 			-- Dodge Process Here
 		end
+		
 	end
 end)
 
 
 UIS.InputEnded:Connect(function(input)
-	if input.KeyCode == sprintKey then
+	if input.KeyCode == sprintProperties.key then
 		Humanoid.WalkSpeed = normalSpeed
-		-- If NOT in middle of dash, reset camera FOV
-		if not dashTrack.isPlaying then
+		-- If NOT dashing, reset camera FOV
+		if can_dash then
 			tSprintEnd:Play()
 		end 
 	end
