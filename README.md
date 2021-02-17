@@ -2,21 +2,21 @@
 
 ## Features
 ### Walk
-- [DONE] Walk Animation
+- [X] Walk Animation
 
 ### Sprint
-- [DONE] Sprint Animation
-- [DONE]  Camera FOV
+- [X] Sprint Animation
+- [X]  Camera FOV
 
 ### Directional Dashes
-- [DONE] Forward Dash
-- [X] Backward Dash
-- [X] Left Dash
-- [X] Right Dash
-- [X] Camera FOV
+- [X] Forward Dash
+- [ ] Backward Dash
+- [ ] Left Dash
+- [ ] Right Dash
+- [ ] Camera FOV
 
 ### Dodges
 - ???
 
 ### Default Camera Perspective
-- [X] Centered
+- [ ] Centered
