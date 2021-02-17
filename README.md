@@ -2,7 +2,7 @@
 ## Bug-Fix
 - [ ] Debounce for Dash to Sprint Animation
 - [ ] Debris moves Humanoid Angle -> Set Humanoid Angle Constant
-- [ ] Camera Rebind After Respawn
+- [ ] Camera Glitch After Respawn
 
 ## Recommendations
 - [ ] BodyVelocity instead of Velocity for Dash?
