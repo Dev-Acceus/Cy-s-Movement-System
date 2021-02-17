@@ -1,7 +1,12 @@
 # Cyrus-Movement-System
 ## Bug-Fix
 - [ ] Debounce for Dash to Sprint Animation
-- [ ] BodyVelocity instead of Velocity?
+- [ ] Debris moves Humanoid Angle -> Set Humanoid Angle Constant
+- [ ] Camera Rebind After Respawn
+
+## Recommendations
+- [ ] BodyVelocity instead of Velocity for Dash?
+- [ ] Longer Cooldown?
 
 ## Features
 ### Walk
@@ -22,4 +27,4 @@
 - ???
 
 ### Default Camera Perspective
-- [ ] Centered
+- [X] Centered
