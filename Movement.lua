@@ -20,7 +20,7 @@ local sprintProperties = {
 	speed = 35
 }
 
-local sprintFov = { FieldOfView = 70 + (sprintProperties.speed/4) }
+local sprintFov = { FieldOfView = 70 + (sprintProperties.speed/3) }
 local tSprintStart = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), sprintFov)
 local tSprintEnd = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), fovDefault)
 
@@ -37,11 +37,14 @@ local dashProperties = {
 	lastS = tick(),
 	lastA = tick(),
 	lastD = tick(),
+	lastKeyPressed = nil,
 	
 	tapSpeed = 0.3,
 	cooldown = 2,
-	velocity = 175
+	velocity = 225
 }
+
+can_dash = true
 
 --|| DASH ANIMATIONS ||--
 local frontDashTrack = Humanoid:LoadAnimation(Storage.Animations.FrontDash)		-- dash animation object
@@ -50,7 +53,7 @@ local leftDashTrack = Humanoid:LoadAnimation(Storage.Animations.LeftDash)
 local rightDashTrack = Humanoid:LoadAnimation(Storage.Animations.RightDash)
 
 local dashFov = { FieldOfView = 70 + (dashProperties.velocity / 11)}	-- camera FOV changes when player dashes
-local dashCamResetTime = .5									-- time before camera resets back to original
+local dashCamResetTime = .8							-- time before camera resets back to original
 local tDashStart = game.TweenService:Create(camera, TweenInfo.new(0.4, Enum.EasingStyle.Sine), dashFov)
 local tDashEnd = tSprintEnd
 
@@ -71,7 +74,7 @@ local function playDashAnimations(direction)
 	tDashStart:Play()		-- camera FOV tween
 end
 
-can_dash = true
+
 
 --|| EVENTS ||--
 
@@ -85,7 +88,7 @@ Player.CharacterAdded:Connect(function(char)
 	backDashTrack = Humanoid:LoadAnimation(Storage.Animations.BackDash)
 	leftDashTrack = Humanoid:LoadAnimation(Storage.Animations.LeftDash)
 	rightDashTrack = Humanoid:LoadAnimation(Storage.Animations.RightDash)
-	Humanoid.WalkSpeed = normalSpeed
+	game:GetService("StarterPlayer").EnableMouseLockOption = false	-- disable mouselock
 end)
 
 
@@ -105,7 +108,7 @@ UIS.InputBegan:Connect(function(input, processed)
 			-- front dash
 			if input.KeyCode == dashProperties.frontKey then
 				-- double tap check
-				if tick() - dashProperties.lastW <= dashProperties.tapSpeed then
+				if dashProperties.lastKeyPressed == dashProperties.frontKey and tick() - dashProperties.lastW <= dashProperties.tapSpeed then
 					Root.Velocity = Root.CFrame.lookVector * dashProperties.velocity
 					can_dash = false
 					-- play dash animation and camera FOV
@@ -127,7 +130,7 @@ UIS.InputBegan:Connect(function(input, processed)
 			-- back dash
 			elseif input.KeyCode == dashProperties.backKey then
 				-- double tap check
-				if tick() - dashProperties.lastS <= dashProperties.tapSpeed then
+				if dashProperties.lastKeyPressed == dashProperties.backKey and tick() - dashProperties.lastS <= dashProperties.tapSpeed then
 					-- back dash process	
 					Root.Velocity = Root.CFrame.lookVector * -dashProperties.velocity
 					can_dash = false
@@ -148,7 +151,7 @@ UIS.InputBegan:Connect(function(input, processed)
 				
 			-- left dash
 			elseif input.KeyCode == dashProperties.leftKey then
-				if tick() - dashProperties.lastA <= dashProperties.tapSpeed then
+				if dashProperties.lastKeyPressed == dashProperties.leftKey and tick() - dashProperties.lastA <= dashProperties.tapSpeed then
 					Root.Velocity = Root.CFrame.RightVector * -dashProperties.velocity
 					can_dash = false
 					-- play dash animations and camera FOV
@@ -168,7 +171,7 @@ UIS.InputBegan:Connect(function(input, processed)
 				
 			-- right dash
 			elseif input.KeyCode == dashProperties.rightKey then
-				if tick() - dashProperties.lastD <= dashProperties.tapSpeed then
+				if dashProperties.lastKeyPressed == dashProperties.rightKey and tick() - dashProperties.lastD <= dashProperties.tapSpeed then
 					Root.Velocity = Root.CFrame.RightVector * dashProperties.velocity
 					can_dash = false
 					-- play dash animations and camera FOV
@@ -186,6 +189,9 @@ UIS.InputBegan:Connect(function(input, processed)
 				end
 				dashProperties.lastD = tick()
 			end
+			
+			dashProperties.lastKeyPressed = input.KeyCode
+			print(dashProperties.lastKeyPressed)
 			
 		-- Dodge
 		elseif input.KeyCode == dodgeKey then
