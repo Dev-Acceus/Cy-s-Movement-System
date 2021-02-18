@@ -1,10 +1,11 @@
 # Cyrus-Movement-System
 ## Bug-Fix
-- [ ] Debounce for Dash to Sprint Animation
 - [X] Dash executes despite random WASD movement -> Reduce tapSpeed and add debounce (lastKeyPressed)
 - [ ] Debris moves Humanoid Angle -> Set Humanoid Angle Constant
 - [ ] Camera Glitches After Respawn
+- [ ] Debounce for Dash to Sprint Animation
 - [ ] Sprint Animation executes without moving
+
 
 ## Recommendations
 - [X] BodyVelocity instead of Velocity for Dash? -> nah
