@@ -4,6 +4,7 @@
 - [ ] Dash executes despite random WASD movement -> Reduce tapSpeed and add debounce (lastKeyPressed)
 - [ ] Debris moves Humanoid Angle -> Set Humanoid Angle Constant
 - [ ] Camera Glitches After Respawn
+- [ ] Sprint Animation executes without moving
 
 ## Recommendations
 - [ ] BodyVelocity instead of Velocity for Dash?
