@@ -7,8 +7,12 @@ local camera = workspace.CurrentCamera
 local cameraOffset = Vector3.new(2, 2, 8)
 local player = Players.LocalPlayer
 
-player.CharacterAdded:Connect(function(character)
+local connection
 
+player.CharacterAdded:Connect(function(character)
+	if connection then
+		connection:Disconnect()
+	end
 	local humanoid = character:WaitForChild("Humanoid")
 	local rootPart = character:WaitForChild("HumanoidRootPart")
 	humanoid.AutoRotate = false
@@ -28,7 +32,7 @@ player.CharacterAdded:Connect(function(character)
 	end
 	ContextActionService:BindAction("PlayerInput", playerInput, false, Enum.UserInputType.MouseMovement, Enum.UserInputType.Touch)
 
-	RunService.RenderStepped:Connect(function()
+	connection = RunService.RenderStepped:Connect(function()
 		if camera.CameraType ~= Enum.CameraType.Scriptable then
 			camera.CameraType = Enum.CameraType.Scriptable
 		end
@@ -37,7 +41,10 @@ player.CharacterAdded:Connect(function(character)
 		local cameraFocus = startCFrame:ToWorldSpace(CFrame.new(cameraOffset.X, cameraOffset.Y, -10000))
 		camera.CFrame = CFrame.new(cameraCFrame.Position, cameraFocus.Position)
 	end)
+
 end)
+
+
 
 local function focusControl(actionName, inputState, inputObject)
 	-- Lock and hide mouse icon on input began
