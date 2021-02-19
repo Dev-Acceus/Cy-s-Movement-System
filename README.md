@@ -6,6 +6,7 @@
 - [X] Debounce for Dash to Sprint Animation -> Edit Default Animations based on WalkSpeed instead of local remote event
 - [X] Sprint Animation executes without moving -> Removed local remote event Humanoid:GetPropertyChangedSignal("WalkSpeed")
 - [ ] Animations randomly stop -> Check animation priorities
+- [ ] Camera Field Of View due to Dashing while Sprinting (doesn't reset to origin)
 
 ## Recommendations
 - [X] BodyVelocity instead of Velocity for Dash? -> nah
