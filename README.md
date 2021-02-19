@@ -3,9 +3,9 @@
 - [X] Dash executes despite random WASD movement -> Reduce tapSpeed and add debounce (lastKeyPressed)
 - [X] Debris moves Humanoid Angle -> Set Humanoid Angle Constant
 - [X] Camera Glitches After Respawn -> Disconnect connection before reconnecting
-- [ ] Debounce for Dash to Sprint Animation -> Edit Default Animations based on WalkSpeed instead of local remote event
-- [ ] Sprint Animation executes without moving
-
+- [X] Debounce for Dash to Sprint Animation -> Edit Default Animations based on WalkSpeed instead of local remote event
+- [X] Sprint Animation executes without moving -> Removed local remote event Humanoid:GetPropertyChangedSignal("WalkSpeed")
+- [ ] Animations randomly stop -> Check animation priorities
 
 ## Recommendations
 - [X] BodyVelocity instead of Velocity for Dash? -> nah
