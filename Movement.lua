@@ -5,14 +5,15 @@ local camera = game.Workspace.CurrentCamera
 
 --|| DEFAULT CONSTANTS ||--
 local fovDefault = { FieldOfView = 70 }
-local normalSpeed = 8
+local normalSpeed = 6
 
 --|| PLAYER VARIABLES ||--
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 local Root = Character:WaitForChild("HumanoidRootPart")
-
+local Sound = Root:WaitForChild("Running", 10)
+Sound.Volume = 0
 
 --|| SPRINT VARIABLES ||--
 local sprintProperties = {
@@ -83,12 +84,13 @@ Player.CharacterAdded:Connect(function(char)
 	Character = Player.Character or Player.CharacterAdded:Wait()
 	Humanoid = Character:WaitForChild("Humanoid")
 	Root = Character:WaitForChild("HumanoidRootPart")
+	Sound = Root:WaitForChild("Running", 10)
+	Sound.Volume = 0	-- Removes footsteps sound
 	sprintTrack = Humanoid:LoadAnimation(Storage.Animations.Sprint)			-- sprint animation
 	frontDashTrack = Humanoid:LoadAnimation(Storage.Animations.FrontDash)		-- dash animation object
 	backDashTrack = Humanoid:LoadAnimation(Storage.Animations.BackDash)
 	leftDashTrack = Humanoid:LoadAnimation(Storage.Animations.LeftDash)
 	rightDashTrack = Humanoid:LoadAnimation(Storage.Animations.RightDash)
-	game:GetService("StarterPlayer").EnableMouseLockOption = false	-- disable mouselock
 end)
 
 
@@ -191,7 +193,7 @@ UIS.InputBegan:Connect(function(input, processed)
 			end
 			
 			dashProperties.lastKeyPressed = input.KeyCode
-			print(dashProperties.lastKeyPressed)
+			--print(dashProperties.lastKeyPressed)
 			
 		-- Dodge
 		elseif input.KeyCode == dodgeKey then
@@ -210,15 +212,4 @@ UIS.InputEnded:Connect(function(input)
 			tSprintEnd:Play()
 		end 
 	end
-end)
-
-
--- Sprint Animation
-Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-	if Humanoid.WalkSpeed > normalSpeed then
-		sprintTrack:Play()
-	else
-		sprintTrack:Stop()
-	end
-	
 end)
