@@ -9,8 +9,8 @@
 - [ ] Camera Field Of View due to Dashing while Sprinting (doesn't reset to origin)
 
 ## Recommendations
-- [X] BodyVelocity instead of Velocity for Dash? -> nah
-- [X] Longer Cooldown? -> nah
+- [X] BodyVelocity instead of Velocity for Dash?
+- [X] Longer Cooldown?
 
 ## Features
 ### Walk
